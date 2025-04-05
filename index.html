@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment and Return Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Investment and Return Management</h1>
+
+        <!-- Client Selection and Add/Delete Client Button -->
+        <div>
+            <select id="clientSelect">
+                <option value="">Select Client</option>
+            </select>
+            <button id="addClientBtn">Add Client</button>
+        </div>
+
+        <!-- Investment Table -->
+        <div id="investmentSection" style="display: none;">
+            <h2>Investments</h2>
+            <table id="investmentTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Remarks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div id="totalInvestment"></div>
+            <button id="addInvestmentBtn">Add Investment</button>
+        </div>
+
+        <!-- Returns Table -->
+        <div id="returnsSection" style="display: none;">
+            <h2>Returns</h2>
+            <table id="returnsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Remarks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div id="totalReturns"></div>
+            <button id="addReturnBtn">Add Return</button>
+        </div>
+
+        <!-- Modal for Adding/Editing Investment and Return -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">Add Investment</h2>
+                <form id="modalForm">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                    
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" required>
+                    
+                    <label for="remarks">Remarks:</label>
+                    <input type="text" id="remarks" name="remarks">
+                    
+                    <button type="submit">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
