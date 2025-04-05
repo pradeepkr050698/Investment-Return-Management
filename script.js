@@ -45,12 +45,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Update Client Dropdown
     function updateClientDropdown() {
         clientSelect.innerHTML = '<option value="">Select Client</option>';
-        clients.forEach(client => {
-            const option = document.createElement("option");
-            option.value = client.id;
-            option.textContent = client.name;
-            clientSelect.appendChild(option);
-        });
+        if (clients.length > 0) {
+            clients.forEach(client => {
+                const option = document.createElement("option");
+                option.value = client.id;
+                option.textContent = client.name;
+                clientSelect.appendChild(option);
+            });
+        }
         checkClientSelect();
     }
 

@@ -1,26 +1,26 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Investment & Return Tracker</title>
+    <title>Client Investment Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
-        <h1>Investment & Return Tracker</h1>
-        
-        <!-- Client Selection Dropdown -->
+        <h2>Client Investment Management</h2>
+
+        <!-- Client Selection -->
         <select id="clientSelect">
             <option value="">Select Client</option>
         </select>
-        
-        <!-- Add/Delete Client Button -->
+
         <button id="addClientBtn">Add Client</button>
-        
-        <!-- Investment and Return Sections -->
-        <div id="investmentSection" style="display:none;">
-            <h2>Investments</h2>
-            <button id="addInvestmentBtn">Add Investment</button>
+
+        <!-- Investment Section -->
+        <div id="investmentSection">
+            <h3>Investments</h3>
             <table id="investmentTable">
                 <thead>
                     <tr>
@@ -32,12 +32,13 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <div id="totalInvestment"></div>
+            <button id="addInvestmentBtn" class="blueBtn">Add Investment</button>
+            <p id="totalInvestment">Total Investment: 0</p>
         </div>
 
-        <div id="returnsSection" style="display:none;">
-            <h2>Returns</h2>
-            <button id="addReturnBtn">Add Return</button>
+        <!-- Returns Section -->
+        <div id="returnsSection">
+            <h3>Returns</h3>
             <table id="returnsTable">
                 <thead>
                     <tr>
@@ -49,27 +50,33 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <div id="totalReturns"></div>
+            <button id="addReturnBtn" class="blueBtn">Add Return</button>
+            <p id="totalReturns">Total Returns: 0</p>
         </div>
     </div>
 
-    <!-- Modal for Add Investment / Add Return -->
+    <!-- Modal -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3 id="modalTitle"></h3>
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Investment</h3>
+                <span class="close">&times;</span>
+            </div>
             <form id="modalForm">
-                <label for="date">Date:</label>
-                <input type="date" id="date" required><br><br>
-                <label for="amount">Amount:</label>
-                <input type="number" id="amount" required><br><br>
-                <label for="remarks">Remarks:</label>
-                <textarea id="remarks"></textarea><br><br>
+                <label for="date">Date</label>
+                <input type="date" id="date" required>
+
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" required>
+
+                <label for="remarks">Remarks</label>
+                <input type="text" id="remarks">
+
                 <button type="submit">Save</button>
             </form>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
