@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let clients = JSON.parse(localStorage.getItem("clients")) || [];
     let currentClientId = null;
 
-    // Event Listener for adding new client
+    // Event Listener for adding new client or deleting selected client
     addClientBtn.addEventListener("click", function () {
         if (currentClientId) {
             // Delete Client logic
@@ -51,6 +51,16 @@ document.addEventListener("DOMContentLoaded", function () {
             option.textContent = client.name;
             clientSelect.appendChild(option);
         });
+        checkClientSelect();
+    }
+
+    // Check if a client is selected, change the Add Client button text
+    function checkClientSelect() {
+        if (clientSelect.value) {
+            addClientBtn.textContent = "Delete Client";
+        } else {
+            addClientBtn.textContent = "Add Client";
+        }
     }
 
     // Event listener for client selection
@@ -59,12 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (selectedClientId) {
             currentClientId = selectedClientId;
             showClientData(currentClientId);
-            addClientBtn.textContent = "Delete Client"; // Change button to Delete Client
         } else {
             currentClientId = null;
             hideClientData();
-            addClientBtn.textContent = "Add Client"; // Change button back to Add Client
         }
+        checkClientSelect();
     });
 
     // Show selected client data (investments and returns)
@@ -88,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button class="edit-btn" data-client-id="${clientId}" data-type="investment" data-index="${index}">Edit</button>
                 <button class="delete-btn" data-client-id="${clientId}" data-type="investment" data-index="${index}">Delete</button>
             `;
-            totalInvestment += investment.amount;
+            totalInvestment += parseFloat(investment.amount); // Correctly sum investments
         });
 
         // Fill return table
@@ -102,9 +111,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button class="edit-btn" data-client-id="${clientId}" data-type="return" data-index="${index}">Edit</button>
                 <button class="delete-btn" data-client-id="${clientId}" data-type="return" data-index="${index}">Delete</button>
             `;
-            totalReturns += returnItem.amount;
+            totalReturns += parseFloat(returnItem.amount); // Correctly sum returns
         });
 
+        // Display the totals
         totalInvestmentElement.textContent = `Total Investment: ${totalInvestment}`;
         totalReturnsElement.textContent = `Total Returns: ${totalReturns}`;
 
@@ -131,101 +141,104 @@ document.addEventListener("DOMContentLoaded", function () {
             event.preventDefault();
             const date = document.getElementById("date").value;
             const amount = document.getElementById("amount").value;
-            const remarks = document.getElementById("remarks").value || "N/A";
+            const remarks = document.getElementById("remarks").value;
 
-            if (date && amount) {
-                if (type === 'investment') {
-                    saveInvestment(data.clientId, data.index, date, amount, remarks);
-                } else if (type === 'return') {
-                    saveReturn(data.clientId, data.index, date, amount, remarks);
-                }
-                closeModal();
+            if (type === "investment") {
+                saveInvestment(data.clientId, data.index, { date, amount, remarks });
             } else {
-                alert("Please fill in all the fields.");
+                saveReturn(data.clientId, data.index, { date, amount, remarks });
             }
+
+            modal.style.display = "none";
         };
     }
 
-    function closeModal() {
-        modal.style.display = "none";
-    }
-
-    // Close modal when clicking on the close button (X)
-    closeModalBtn.addEventListener("click", closeModal);
-
-    // Open modal for adding new investment
-    addInvestmentBtn.addEventListener("click", function () {
-        if (currentClientId) {
-            openModal("Add Investment", "investment", { clientId: currentClientId });
-        } else {
-            alert("Please select a client first.");
-        }
-    });
-
-    // Open modal for adding new return
-    addReturnBtn.addEventListener("click", function () {
-        if (currentClientId) {
-            openModal("Add Return", "return", { clientId: currentClientId });
-        } else {
-            alert("Please select a client first.");
-        }
-    });
-
-    // Save or Update Investment
-    function saveInvestment(clientId, index, date, amount, remarks) {
+    // Save Investment data
+    function saveInvestment(clientId, index, investmentData) {
         let investments = JSON.parse(localStorage.getItem(`investments_${clientId}`)) || [];
         if (index !== undefined) {
-            investments[index] = { date, amount: parseFloat(amount), remarks };
+            investments[index] = investmentData;
         } else {
-            investments.push({ date, amount: parseFloat(amount), remarks });
+            investments.push(investmentData);
         }
         localStorage.setItem(`investments_${clientId}`, JSON.stringify(investments));
         showClientData(clientId);
     }
 
-    // Save or Update Return
-    function saveReturn(clientId, index, date, amount, remarks) {
+    // Save Return data
+    function saveReturn(clientId, index, returnData) {
         let returns = JSON.parse(localStorage.getItem(`returns_${clientId}`)) || [];
         if (index !== undefined) {
-            returns[index] = { date, amount: parseFloat(amount), remarks };
+            returns[index] = returnData;
         } else {
-            returns.push({ date, amount: parseFloat(amount), remarks });
+            returns.push(returnData);
         }
         localStorage.setItem(`returns_${clientId}`, JSON.stringify(returns));
         showClientData(clientId);
     }
 
-    // Edit Investment
-    document.addEventListener("click", function (event) {
-        if (event.target && event.target.classList.contains("edit-btn")) {
-            const clientId = event.target.getAttribute("data-client-id");
-            const type = event.target.getAttribute("data-type");
-            const index = event.target.getAttribute("data-index");
-            if (type === "investment") {
-                const investments = JSON.parse(localStorage.getItem(`investments_${clientId}`)) || [];
-                openModal("Edit Investment", "investment", { clientId, index, ...investments[index] });
-            } else if (type === "return") {
-                const returns = JSON.parse(localStorage.getItem(`returns_${clientId}`)) || [];
-                openModal("Edit Return", "return", { clientId, index, ...returns[index] });
-            }
+    // Delete Client
+    function deleteClient(clientId) {
+        clients = clients.filter(client => client.id !== clientId);
+        localStorage.setItem("clients", JSON.stringify(clients));
+
+        // Clear client-specific investments and returns
+        localStorage.removeItem(`investments_${clientId}`);
+        localStorage.removeItem(`returns_${clientId}`);
+
+        updateClientDropdown();
+        hideClientData();
+        alert("Client deleted successfully.");
+    }
+
+    // Add Investment Button functionality
+    addInvestmentBtn.addEventListener('click', function () {
+        if (currentClientId) {
+            openModal('Add Investment', 'investment', { clientId: currentClientId });
         }
     });
 
-    // Delete Investment
-    document.addEventListener("click", function (event) {
-        if (event.target && event.target.classList.contains("delete-btn")) {
-            const clientId = event.target.getAttribute("data-client-id");
-            const type = event.target.getAttribute("data-type");
-            const index = event.target.getAttribute("data-index");
-            if (type === "investment") {
+    // Add Return Button functionality
+    addReturnBtn.addEventListener('click', function () {
+        if (currentClientId) {
+            openModal('Add Return', 'return', { clientId: currentClientId });
+        }
+    });
+
+    // Edit Button functionality
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('edit-btn')) {
+            const clientId = event.target.dataset.clientId;
+            const type = event.target.dataset.type;
+            const index = event.target.dataset.index;
+            const data = type === 'investment' ? 
+                JSON.parse(localStorage.getItem(`investments_${clientId}`))[index] :
+                JSON.parse(localStorage.getItem(`returns_${clientId}`))[index];
+
+            openModal(`Edit ${type.charAt(0).toUpperCase() + type.slice(1)}`, type, {
+                clientId,
+                index,
+                ...data
+            });
+        }
+    });
+
+    // Delete Button functionality
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('delete-btn')) {
+            const clientId = event.target.dataset.clientId;
+            const type = event.target.dataset.type;
+            const index = event.target.dataset.index;
+
+            if (type === 'investment') {
                 deleteInvestment(clientId, index);
-            } else if (type === "return") {
+            } else {
                 deleteReturn(clientId, index);
             }
         }
     });
 
-    // Delete Investment logic
+    // Delete Investment
     function deleteInvestment(clientId, index) {
         let investments = JSON.parse(localStorage.getItem(`investments_${clientId}`)) || [];
         investments.splice(index, 1);
@@ -233,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showClientData(clientId);
     }
 
-    // Delete Return logic
+    // Delete Return
     function deleteReturn(clientId, index) {
         let returns = JSON.parse(localStorage.getItem(`returns_${clientId}`)) || [];
         returns.splice(index, 1);
@@ -241,17 +254,11 @@ document.addEventListener("DOMContentLoaded", function () {
         showClientData(clientId);
     }
 
-    // Delete Client logic
-    function deleteClient(clientId) {
-        const clientIndex = clients.findIndex(client => client.id === clientId);
-        clients.splice(clientIndex, 1);
-        localStorage.setItem("clients", JSON.stringify(clients));
-        localStorage.removeItem(`investments_${clientId}`);
-        localStorage.removeItem(`returns_${clientId}`);
-        updateClientDropdown();
-        hideClientData();
-    }
+    // Close Modal
+    closeModalBtn.addEventListener('click', function () {
+        modal.style.display = "none";
+    });
 
-    // Initialize by updating the dropdown
+    // Initialize the client dropdown on page load
     updateClientDropdown();
 });
